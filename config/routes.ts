@@ -1,4 +1,14 @@
-﻿export default [
+﻿const otherRutes = [
+  {
+    path: '/questionnaire/add',
+    name: '新增问诊',
+    icon: 'smile',
+    hideInMenu: true,
+    component: './Questionnaire/components/AddQue',
+  },
+];
+
+export default [
   {
     path: '/user',
     layout: false,
@@ -76,6 +86,7 @@
       },
     ],
   },
+  ...otherRutes,
   {
     path: '/',
     redirect: '/questionnaire',
