@@ -3,7 +3,6 @@ import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
 import { Button, message } from 'antd';
 import { FormInstance } from 'antd/lib/form';
 import { getQueList, updateQue } from './service';
-// import AddQue from './components/AddQue';
 import { history, useRequest } from 'umi';
 
 export interface TableListItem {
@@ -36,12 +35,7 @@ const Page: React.FC = () => {
             dataIndex: 'title',
             render: (text, record) => {
                 return <a onClick={() => {
-                    history.push({
-                        pathname: '/questionnaire/add',
-                        query: {
-                            id: record.id
-                        }
-                    });
+
                 }}>{text}</a>
             }
         },
@@ -84,17 +78,23 @@ const Page: React.FC = () => {
             render: (_, record) => {
                 return <>
                     <Button loading={fetches[record.id]?.loading} type="primary" onClick={() => {
-                        reqUpdate({
-                            id: record.id,
-                            status: 1,
-                        })
-                    }}>发布</Button>
+                        // reqUpdate({
+                        //     id: record.id,
+                        //     status: 1,
+                        // })
+                    }}>配置</Button>
                     <Button onClick={() => {
-                        reqUpdate({
-                            id: record.id,
-                            status: 0,
-                        })
-                    }} style={{ marginLeft: 10 }} type="primary" danger>撤回</Button>
+                        // reqUpdate({
+                        //     id: record.id,
+                        //     status: 0,
+                        // })
+                        history.push({
+                            pathname: '/questionnaire/add',
+                            query: {
+                                id: record.id
+                            }
+                        });
+                    }} style={{ marginLeft: 10 }} type="primary">修改</Button>
                 </>
             }
         },
@@ -129,6 +129,12 @@ const Page: React.FC = () => {
             formRef={ref}
             toolBarRender={() => [
                 // eslint-disable-next-line react/jsx-key
+                <Button type="primary">
+                    发布
+                </Button>,
+                <Button type="primary" danger>
+                    撤销
+                </Button>,
                 <Button
                     type="primary"
                     onClick={() => {

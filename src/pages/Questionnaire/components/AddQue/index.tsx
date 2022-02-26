@@ -113,7 +113,10 @@ const Page: React.FC<PageProps> = ({ }) => {
                         {!!id && isEdt && <Button style={{ marginRight: 20 }} onClick={() => {
                             setEdit(false);
                         }} size="large" >取消编辑</Button>}
-                        <Button loading={updateLoading || addLoading} size="large" type="primary" htmlType="submit">保存</Button>
+                        <Button style={{ marginRight: 20 }} loading={updateLoading || addLoading} size="large" type="primary" htmlType="submit">保存</Button>
+                        <Button onClick={() => {
+                            history.goBack();
+                        }} size="large">返回</Button>
                     </Form.Item>
                 </Form>
             </div>
