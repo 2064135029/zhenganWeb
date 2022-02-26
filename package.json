@@ -53,6 +53,7 @@
     "@ant-design/pro-table": "^2.61.0",
     "@umijs/route-utils": "^2.0.0",
     "antd": "^4.17.0",
+    "braft-editor": "^2.3.9",
     "classnames": "^2.3.0",
     "lodash": "^4.17.0",
     "md5": "^2.3.0",
