@@ -27,14 +27,10 @@ const Page: React.FC = () => {
             dataIndex: 'title',
         },
         {
-            title: '描述',
-            dataIndex: 'desc',
-        },
-        {
             title: '状态',
             dataIndex: 'status',
             valueEnum: {
-                0: { text: '已撤销', status: 'Default' },
+                0: { text: '待发布', status: 'Default' },
                 1: { text: '已发布', status: 'Success' },
             },
         },
@@ -45,12 +41,12 @@ const Page: React.FC = () => {
         },
         {
             title: '创建时间',
-            dataIndex: 'createTime',
+            dataIndex: 'create_time',
             hideInSearch: true
         },
         {
             title: '修改时间',
-            dataIndex: 'updateTime',
+            dataIndex: 'update_time',
             hideInSearch: true
         },
         {
@@ -61,12 +57,12 @@ const Page: React.FC = () => {
         {
             title: '操作',
             key: 'option',
-            width: 120,
+            width: 160,
             valueType: 'option',
             render: () => {
                 return <>
-                    <Button>发布</Button>
-                    <Button>撤销</Button>
+                    <Button type="primary">发布</Button>
+                    <Button type="primary" danger>撤回</Button>
                 </>
             }
         },
@@ -81,9 +77,10 @@ const Page: React.FC = () => {
                 };
                 delete p.current;
                 return getQueList(p).then((res) => {
+                    console.log(res);
                     return Promise.resolve({
-                        data: res.resultData,
-                        total: res.totalRow,
+                        data: res.data.resultData,
+                        total: res.data.totalRow,
                     });
                 });
             }
