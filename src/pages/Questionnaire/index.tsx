@@ -1,30 +1,49 @@
 import React, { useRef, useState } from 'react';
-import ProTable, { ProColumns } from '@ant-design/pro-table';
-import { Button } from 'antd';
+import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
+import { Button, message } from 'antd';
 import { FormInstance } from 'antd/lib/form';
-import { getQueList } from './service';
-import AddQue from './components/AddQue';
-import { history } from 'umi';
+import { getQueList, updateQue } from './service';
+// import AddQue from './components/AddQue';
+import { history, useRequest } from 'umi';
 
 export interface TableListItem {
-    key: number;
-    name: string;
+    id: number;
+    title: string;
     status: string;
-    updatedAt: number;
-    createdAt: number;
-    progress: number;
-    money: number;
+    createBy: string;
+    updateBy: string;
+    update_time: string;
+    create_time: string;
 }
 
 const Page: React.FC = () => {
     const ref = useRef<FormInstance>();
+    const tableRef = useRef<ActionType>();
     const [collapsed, setCollapsed] = useState(false);
-    const [addVisible, setAddVisible] = useState<boolean>(false);
+    const { fetches, run: reqUpdate } = useRequest(updateQue, {
+        manual: true,
+        fetchKey: p => p.id,
+        onSuccess: () => {
+            message.success('修改成功');
+            tableRef.current?.reload();
+        }
+    });
+    // const [addVisible, setAddVisible] = useState<boolean>(false);
 
     const columns: ProColumns<TableListItem>[] = [
         {
             title: '标题',
             dataIndex: 'title',
+            render: (text, record) => {
+                return <a onClick={() => {
+                    history.push({
+                        pathname: '/questionnaire/add',
+                        query: {
+                            id: record.id
+                        }
+                    });
+                }}>{text}</a>
+            }
         },
         {
             title: '状态',
@@ -36,22 +55,25 @@ const Page: React.FC = () => {
         },
         {
             title: '创建人',
-            dataIndex: 'createBy',
-            hideInSearch: true
+            dataIndex: 'createByName',
+            hideInSearch: true,
+
         },
         {
             title: '创建时间',
             dataIndex: 'create_time',
-            hideInSearch: true
+            hideInSearch: true,
+            valueType: 'dateTime',
         },
         {
             title: '修改时间',
             dataIndex: 'update_time',
-            hideInSearch: true
+            hideInSearch: true,
+            valueType: 'dateTime',
         },
         {
             title: '修改人',
-            dataIndex: 'updateBy',
+            dataIndex: 'updateByName',
             hideInSearch: true
         },
         {
@@ -59,10 +81,20 @@ const Page: React.FC = () => {
             key: 'option',
             width: 160,
             valueType: 'option',
-            render: () => {
+            render: (_, record) => {
                 return <>
-                    <Button type="primary">发布</Button>
-                    <Button type="primary" danger>撤回</Button>
+                    <Button loading={fetches[record.id]?.loading} type="primary" onClick={() => {
+                        reqUpdate({
+                            id: record.id,
+                            status: 1,
+                        })
+                    }}>发布</Button>
+                    <Button onClick={() => {
+                        reqUpdate({
+                            id: record.id,
+                            status: 0,
+                        })
+                    }} style={{ marginLeft: 10 }} type="primary" danger>撤回</Button>
                 </>
             }
         },
@@ -70,6 +102,7 @@ const Page: React.FC = () => {
     return <>
         <ProTable<TableListItem>
             columns={columns}
+            actionRef={tableRef}
             request={(params) => {
                 const p = {
                     ...params,
