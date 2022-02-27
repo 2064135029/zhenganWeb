@@ -35,3 +35,12 @@ export async function getQueById(id: string) {
     skipErrorHandler: true,
   });
 }
+
+// 修改
+export async function releaseQue(params: any) {
+  return request('/web/que/release', {
+    method: 'POST',
+    data: params,
+    skipErrorHandler: true,
+  });
+}

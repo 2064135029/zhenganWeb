@@ -1,8 +1,8 @@
 import React, { useRef, useState } from 'react';
 import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
-import { Button, message } from 'antd';
+import { Button, message, Modal } from 'antd';
 import { FormInstance } from 'antd/lib/form';
-import { getQueList, updateQue } from './service';
+import { getQueList, updateQue, releaseQue } from './service';
 import { history, useRequest } from 'umi';
 
 export interface TableListItem {
@@ -18,6 +18,7 @@ export interface TableListItem {
 const Page: React.FC = () => {
     const ref = useRef<FormInstance>();
     const tableRef = useRef<ActionType>();
+    const [selectedRows, setselectedRows] = useState<any>([]);
     const [collapsed, setCollapsed] = useState(false);
     const { fetches, run: reqUpdate } = useRequest(updateQue, {
         manual: true,
@@ -27,6 +28,7 @@ const Page: React.FC = () => {
             tableRef.current?.reload();
         }
     });
+
     // const [addVisible, setAddVisible] = useState<boolean>(false);
 
     const columns: ProColumns<TableListItem>[] = [
@@ -99,8 +101,17 @@ const Page: React.FC = () => {
             }
         },
     ];
+    const rowSelection = {
+        type: 'radio',
+        // eslint-disable-next-line @typescript-eslint/no-shadow
+        onChange: (selectedRowKeys: React.Key[], selectedRows: any) => {
+            setselectedRows(selectedRows);
+            console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+        },
+    }
     return <>
         <ProTable<TableListItem>
+            rowSelection={rowSelection}
             columns={columns}
             actionRef={tableRef}
             request={(params) => {
@@ -129,10 +140,40 @@ const Page: React.FC = () => {
             formRef={ref}
             toolBarRender={() => [
                 // eslint-disable-next-line react/jsx-key
-                <Button type="primary">
+                <Button onClick={() => {
+                    const item = selectedRows[0];
+                    Modal.confirm({
+                        title: '温馨提示',
+                        content: '是否要发布:' + item.title,
+                        onOk: () => {
+                            return releaseQue({
+                                id: item.id,
+                                status: 1,
+                            }).then(() => {
+                                message.success('发布成功');
+                                tableRef.current?.reload();
+                            })
+                        }
+                    })
+                }} disabled={selectedRows.length == 0} type="primary">
                     发布
                 </Button>,
-                <Button type="primary" danger>
+                <Button onClick={() => {
+                    const item = selectedRows[0];
+                    Modal.confirm({
+                        title: '温馨提示',
+                        content: '是否要撤销发布:' + item.title,
+                        onOk: () => {
+                            return updateQue({
+                                id: item.id,
+                                status: 0,
+                            }).then(() => {
+                                message.success('撤销成功');
+                                tableRef.current?.reload();
+                            })
+                        }
+                    })
+                }} disabled={selectedRows.length == 0} type="primary" danger>
                     撤销
                 </Button>,
                 <Button

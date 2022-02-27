@@ -1,0 +1,82 @@
+.busComFullscreenModal {
+  .header {
+    position: relative;
+    color: rgba(0, 0, 0, 0.65);
+    background: #fff;
+    box-shadow: 0 4px 8px 0 rgba(0, 21, 41, 0.12);
+    z-index: 999;
+
+    .headerTop {
+      height: 80px;
+
+      .title {
+        padding: 0 24px;
+        color: rgba(0, 0, 0, 0.85);
+        font-weight: 500;
+        font-size: 20px;
+        line-height: 80px;
+        word-wrap: break-word;
+      }
+    }
+
+    .tabs {
+      padding: 0 24px;
+      :global {
+        .ant-tabs-bar {
+          margin: 0;
+          border-bottom-width: 0;
+        }
+      }
+    }
+  }
+
+  .body {
+    position: absolute;
+    top: 125px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 24px;
+    overflow-y: auto;
+
+    &.bodyTop {
+      top: 80px !important;
+    }
+    &.bodyBottom {
+      bottom: 80px !important;
+    }
+  }
+
+  .footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 80px;
+    overflow: hidden;
+    border-top: 1px solid #e8e8e8;
+  }
+
+  .defaultBtns {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+  }
+
+  :global {
+    .ant-modal {
+      top: 0;
+      height: 100%;
+      padding-bottom: 0;
+
+      .ant-modal-content {
+        height: 100%;
+        overflow: hidden;
+        border-radius: 0;
+
+        .ant-modal-body {
+          padding: 0;
+        }
+      }
+    }
+  }
+}

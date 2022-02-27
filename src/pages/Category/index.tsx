@@ -1,11 +1,13 @@
 
 import React, { useRef, useState } from 'react';
 import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
-import { Button, message } from 'antd';
+import { Button, message, Modal } from 'antd';
 import { FormInstance } from 'antd/lib/form';
-import { getCategoryList, updateQue } from './service';
+import { getCategoryList, updateCate, updateSub } from './service';
 import { history, useRequest } from 'umi';
-import AddCate from './components/AddSub';
+import AddCate from './components/AddCate';
+import AddSub from './components/AddSub';
+
 
 export interface TableListItem {
     id: number;
@@ -20,17 +22,16 @@ export interface TableListItem {
 
 const Page: React.FC = () => {
     const [addVisiable, setVisiable] = useState<boolean>(false);
+    const [addSubVisi, setAddSubVisi] = useState<boolean>(false);
+    const [selectItem, setSelectItem] = useState<any>(null);
+    const [selectSub, setSelectSub] = useState<any>(null);
+
     const ref = useRef<FormInstance>();
     const tableRef = useRef<ActionType>();
     const columns: ProColumns<TableListItem>[] = [
         {
             title: '父类名称',
             dataIndex: 'name',
-            render: (text, record) => {
-                return <a onClick={() => {
-
-                }}>{text}</a>
-            }
         },
         {
             title: '状态',
@@ -71,31 +72,44 @@ const Page: React.FC = () => {
             render: (_, record) => {
                 return <>
                     <Button type="primary" onClick={() => {
+                        setSelectItem(record);
+                        setAddSubVisi(true);
                     }}>添加子类</Button>
                     <Button onClick={() => {
-                        history.push({
-                            pathname: '/questionnaire/add',
-                            query: {
-                                id: record.id
-                            }
-                        });
+                        setSelectItem(record);
+                        setVisiable(true);
                     }} style={{ marginLeft: 10 }} type="primary">修改</Button>
-                    <Button onClick={() => { }
+                    <Button onClick={() => {
+                        Modal.confirm({
+                            title: '温馨提示',
+                            content: '是否要删除:' + record.name,
+                            onOk: () => {
+                                return updateCate({
+                                    id: record.id,
+                                    status: 2,
+                                }).then(() => {
+                                    message.success('删除成功');
+                                    tableRef.current?.reload();
+                                })
+                            }
+                        })
+
+                    }
                     } style={{ marginLeft: 10 }} type="primary" danger>删除</Button>
                 </>
             }
         },
     ];
-    const expandedRowRender = () => {
-        const data = [];
-        for (let i = 0; i < 3; i += 1) {
-            data.push({
-                key: i,
-                date: '2014-12-24 23:12:00',
-                name: 'This is production name',
-                upgradeNum: 'Upgraded: 56',
-            });
-        }
+    const expandedRowRender = (record) => {
+        const data = record.sub;
+        // for (let i = 0; i < 3; i += 1) {
+        //     data.push({
+        //         key: i,
+        //         date: '2014-12-24 23:12:00',
+        //         name: 'This is production name',
+        //         upgradeNum: 'Upgraded: 56',
+        //     });
+        // }
         return (
             <ProTable
                 columns={[
@@ -118,7 +132,24 @@ const Page: React.FC = () => {
                         dataIndex: 'operation',
                         key: 'operation',
                         valueType: 'option',
-                        render: () => [<a>修改</a>, <a>删除</a>],
+                        render: (_, record) => [<a onClick={() => {
+                            setSelectSub(record)
+                        }}>修改</a>, <a onClick={() => {
+                            Modal.confirm({
+                                title: '温馨提示',
+                                content: '是否要删除:' + record.name,
+                                onOk: () => {
+                                    return updateSub({
+                                        id: record.id,
+                                        status: 2,
+                                    }).then(() => {
+                                        message.success('删除成功');
+                                        tableRef.current?.reload();
+                                    })
+                                }
+                            })
+
+                        }}>删除</a>],
                     },
                 ]}
                 headerTitle={false}
@@ -129,11 +160,18 @@ const Page: React.FC = () => {
             />
         );
     };
+
     return <>
         <ProTable<TableListItem>
+            key="id"
+            // rowSelection={rowSelection}
             columns={columns}
             actionRef={tableRef}
-            expandable={{ expandedRowRender }}
+            expandable={{
+                expandedRowRender: (record) => {
+                    return expandedRowRender(record)
+                }
+            }}
             request={(params) => {
                 const p = {
                     ...params,
@@ -161,6 +199,8 @@ const Page: React.FC = () => {
                     onClick={() => {
                         // setAddVisible(true);
                         // history.push('/questionnaire/add')
+                        setSelectItem(null);
+                        setSelectItem(null);
                         setVisiable(true);
                     }}
                 >
@@ -170,10 +210,17 @@ const Page: React.FC = () => {
             options={false}
             dateFormatter="string"
         />
-        {addVisiable && <AddCate visiable={addVisiable} onClose={() => {
+        {addVisiable && <AddCate data={selectItem} visiable={addVisiable} onClose={() => {
             setVisiable(false);
         }} onRefresh={() => {
             tableRef.current?.reload();
+            setVisiable(false);
+        }} />}
+        {addSubVisi && selectItem && <AddSub data={selectSub} cateItem={selectItem} visiable={addSubVisi} onClose={() => {
+            setAddSubVisi(false);
+        }} onRefresh={() => {
+            tableRef.current?.reload();
+            setAddSubVisi(false);
         }} />}
     </>
 }
