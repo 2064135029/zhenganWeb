@@ -99,16 +99,12 @@ const ResponseInterceptors = async (response: Response, options: RequestOptionsI
         success: true
       });
     }
-    // if (code === 12001 || code === 12016) {
-    //   message.error(msg);
-    //   localStorage.auth_token = '';
-    //   if (history.location.pathname.indexOf('home') >= 0) {
-    //     // PubSub.publish('login', res);
-    //   } else {
-    //     history.push('/user/login');
-    //   }
-    //   return Promise.reject(res);
-    // }
+    if (status === 10) {
+      message.error(msg);
+      localStorage.auth_token = '';
+      history.push('/user/login');
+      return Promise.reject(res);
+    }
 
     Modal.warning({
       title: '温馨提示',
