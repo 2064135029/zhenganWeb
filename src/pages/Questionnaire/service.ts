@@ -44,3 +44,59 @@ export async function releaseQue(params: any) {
     skipErrorHandler: true,
   });
 }
+
+export async function getTopicList(params: any) {
+  return request('/web/que/getTopicList', {
+    method: 'POST',
+    data: params,
+    skipErrorHandler: true,
+  });
+}
+
+export async function updateTopic(params: any) {
+  return request('/web/que/updateTopic', {
+    method: 'POST',
+    data: params,
+    skipErrorHandler: true,
+  });
+}
+
+export async function updateAnswer(params: any) {
+  return request('/web/que/updateAnswer', {
+    method: 'POST',
+    data: params,
+    skipErrorHandler: true,
+  });
+}
+
+export async function addTopic(params: any) {
+  return request('/web/que/addTopic', {
+    method: 'POST',
+    data: params,
+    skipErrorHandler: true,
+  });
+}
+
+export async function addAnswer(params: any) {
+  return request('/web/que/addAnswer', {
+    method: 'POST',
+    data: params,
+    skipErrorHandler: true,
+  });
+}
+
+export async function getAllCate(params: any) {
+  return request('/web/category/getAllCate', {
+    method: 'POST',
+    data: params,
+    skipErrorHandler: true,
+  });
+}
+
+export async function getSubByCate(params: any) {
+  return request('/web/category/getSubByCate', {
+    method: 'POST',
+    data: params,
+    skipErrorHandler: true,
+  });
+}

@@ -3,6 +3,8 @@ import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
 import { Button, message, Modal } from 'antd';
 import { FormInstance } from 'antd/lib/form';
 import { getQueList, updateQue, releaseQue } from './service';
+import SetQue from './components/SetQue';
+
 import { history, useRequest } from 'umi';
 
 export interface TableListItem {
@@ -29,17 +31,13 @@ const Page: React.FC = () => {
         }
     });
 
-    // const [addVisible, setAddVisible] = useState<boolean>(false);
+    const [visible, setVisible] = useState<boolean>(false);
+    const [selectItem, setSelectItem] = useState(null);
 
     const columns: ProColumns<TableListItem>[] = [
         {
             title: '标题',
             dataIndex: 'title',
-            render: (text, record) => {
-                return <a onClick={() => {
-
-                }}>{text}</a>
-            }
         },
         {
             title: '状态',
@@ -84,6 +82,8 @@ const Page: React.FC = () => {
                         //     id: record.id,
                         //     status: 1,
                         // })
+                        setSelectItem(record);
+                        setVisible(true);
                     }}>配置</Button>
                     <Button onClick={() => {
                         // reqUpdate({
@@ -189,7 +189,9 @@ const Page: React.FC = () => {
             options={false}
             dateFormatter="string"
         />
-        {/* <AddQue visible={addVisible} /> */}
+        {visible && selectItem && <SetQue data={selectItem} visible={visible} onClose={() => {
+            setVisible(false)
+        }} />}
     </>
 }
 export default Page;

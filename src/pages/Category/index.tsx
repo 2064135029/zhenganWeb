@@ -9,7 +9,7 @@ import AddCate from './components/AddCate';
 import AddSub from './components/AddSub';
 
 
-export interface TableListItem {
+interface TableListItem {
     id: number;
     title: string;
     status: string;
