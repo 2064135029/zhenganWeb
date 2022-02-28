@@ -1,27 +1,30 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { PlusOutlined, EllipsisOutlined } from '@ant-design/icons';
-import { Button, Tag, Space, Menu, Dropdown } from 'antd';
+import { Button, message, Modal } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-
+import { getRoles, updateRole } from '../service';
+import AddRole from './AddRole';
+import { useRequest } from 'umi';
 
 type GithubIssueItem = {
-    url: string;
-    id: number;
-    number: number;
-    title: string;
-    labels: {
-        name: string;
-        color: string;
-    }[];
-    state: string;
-    comments: number;
-    created_at: string;
-    updated_at: string;
-    closed_at?: string;
+
 };
 const Page: React.FC = () => {
     const actionRef = useRef<ActionType>();
+    const [visiable, setVisiable] = useState<boolean>(false);
+    const [selectItem, setSelectItem] = useState(null);
+
+    const { run: reqUpdate } = useRequest(updateRole, {
+        fetchKey: arg => arg.id,
+        manual: true,
+        onSuccess: () => {
+            message.success('操作成功')
+            actionRef.current?.reload();
+        }
+    })
+
+
     const columns: ProColumns<GithubIssueItem>[] = [
         {
             dataIndex: 'index',
@@ -29,88 +32,79 @@ const Page: React.FC = () => {
             width: 48,
         },
         {
-            title: '标题',
-            dataIndex: 'title',
-            copyable: true,
-            ellipsis: true,
-            tip: '标题过长会自动收缩',
-            formItemProps: {
-                rules: [
-                    {
-                        required: true,
-                        message: '此项为必填项',
-                    },
-                ],
-            },
+            title: '角色名称',
+            dataIndex: 'roleName'
+        },
+        {
+            title: '角色',
+            dataIndex: 'type',
+            render: (text) => {
+                return { 1: '管理员', 2: '操作人' }[text]
+            }
         },
         {
             title: '状态',
-            dataIndex: 'state',
-            filters: true,
-            onFilter: true,
+            dataIndex: 'status',
             valueType: 'select',
             valueEnum: {
-                all: { text: '全部', status: 'Default' },
-                open: {
-                    text: '未解决',
+                0: {
+                    text: '停用',
                     status: 'Error',
                 },
-                closed: {
-                    text: '已解决',
+                1: {
+                    text: '启用',
                     status: 'Success',
                     disabled: true,
                 },
-                processing: {
-                    text: '解决中',
-                    status: 'Processing',
-                },
             },
-        },
-        {
-            title: '标签',
-            dataIndex: 'labels',
-            search: false,
-            renderFormItem: (_, { defaultRender }) => {
-                return defaultRender(_);
-            },
-            render: (_, record) => (
-                <Space>
-                    {record.labels.map(({ name, color }) => (
-                        <Tag color={color} key={name}>
-                            {name}
-                        </Tag>
-                    ))}
-                </Space>
-            ),
         },
         {
             title: '创建时间',
-            key: 'showTime',
-            dataIndex: 'created_at',
+            key: 'create_time',
+            dataIndex: 'create_time',
             valueType: 'dateTime',
-            sorter: true,
-            hideInSearch: true,
-        },
-        {
-            title: '创建时间',
-            dataIndex: 'created_at',
-            valueType: 'dateRange',
-            hideInTable: true,
-            search: {
-                transform: (value) => {
-                    return {
-                        startTime: value[0],
-                        endTime: value[1],
-                    };
-                },
-            },
         },
         {
             title: '操作',
+            width: 180,
             valueType: 'option',
-            render: (text, record, _, action) => [
+            render: (_, record: any) => {
+                return <>
+                    <Button disabled={record.canEdit == 0} type="primary" onClick={() => {
+                        setSelectItem(record)
+                        setVisiable(true)
+                    }}>修改</Button>
 
-            ],
+                    {record.status == 0 && <Button disabled={record.canEdit == 0} style={{ marginLeft: 10 }} type="primary" onClick={() => {
+
+                        Modal.confirm({
+                            title: '温馨提示',
+                            content: `确定要启用：${record.roleName}吗?`,
+                            onOk: () => {
+                                return reqUpdate({
+                                    status: 1,
+                                    id: record.id
+                                })
+                            }
+                        })
+
+                    }}>启用</Button>}
+
+                    {record.status == 1 && <Button disabled={record.canEdit == 0} onClick={() => {
+                        Modal.confirm({
+                            title: '温馨提示',
+                            content: `确定要停用：${record.roleName}吗?`,
+                            onOk: () => {
+                                return reqUpdate({
+                                    status: 0,
+                                    id: record.id
+                                })
+                            }
+                        })
+                    }} style={{ marginLeft: 10 }} type="primary" danger>停用</Button>}
+
+                </>
+            }
         },
     ];
 
@@ -119,26 +113,36 @@ const Page: React.FC = () => {
         <ProTable<GithubIssueItem>
             columns={columns}
             actionRef={actionRef}
-            request={async (params = {}, sort, filter) => {
-
-            }}
-            editable={{
-                type: 'multiple',
-            }}
-            columnsState={{
-                persistenceKey: 'pro-table-singe-demos',
-                persistenceType: 'localStorage',
+            request={async () => {
+                return getRoles().then((res) => {
+                    console.log(res);
+                    return Promise.resolve({
+                        data: res.data
+                    });
+                });
             }}
             rowKey="id"
-            search={{
-                labelWidth: 'auto',
-            }}
-            pagination={{
-                pageSize: 10,
-            }}
+            search={false}
+            pagination={false}
             dateFormatter="string"
-            headerTitle="高级表格"
+            headerTitle="系统角色"
+            toolBarRender={() => [
+                <Button
+                    type="primary"
+                    onClick={() => {
+                        setVisiable(true)
+                    }}
+                >
+                    新增
+                </Button>
+            ]}
         />
+        {visiable && <AddRole data={selectItem} visiable={visiable} onRefresh={() => {
+            actionRef.current?.reload();
+            setVisiable(false)
+        }} onClose={() => {
+            setVisiable(false)
+        }} />}
     </>
 }
 export default Page;

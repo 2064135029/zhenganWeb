@@ -1,27 +1,30 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { PlusOutlined, EllipsisOutlined } from '@ant-design/icons';
-import { Button, Tag, Space, Menu, Dropdown } from 'antd';
+import { Button, message, Modal } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { getUserList } from '../service';
+import { getUserList, updateUser } from '../service';
+import AddUser from './AddUser';
+import { useRequest } from 'umi';
 
 type GithubIssueItem = {
-    url: string;
-    id: number;
-    number: number;
-    title: string;
-    labels: {
-        name: string;
-        color: string;
-    }[];
-    state: string;
-    comments: number;
-    created_at: string;
-    updated_at: string;
-    closed_at?: string;
+
 };
 const Page: React.FC = () => {
     const actionRef = useRef<ActionType>();
+    const [visiable, setVisiable] = useState<boolean>(false);
+    const [selectItem, setSelectItem] = useState(null);
+
+    const { run: reqUpdate } = useRequest(updateUser, {
+        fetchKey: arg => arg.id,
+        manual: true,
+        onSuccess: () => {
+            message.success('操作成功')
+            actionRef.current?.reload();
+        }
+    })
+
+
     const columns: ProColumns<GithubIssueItem>[] = [
         {
             dataIndex: 'index',
@@ -29,10 +32,12 @@ const Page: React.FC = () => {
             width: 48,
         },
         {
-            title: '用户名',
-            dataIndex: 'userName',
-            copyable: true,
-            ellipsis: true
+            title: '用户名称',
+            dataIndex: 'userName'
+        },
+        {
+            title: '角色',
+            dataIndex: 'roleName',
         },
         {
             title: '状态',
@@ -58,14 +63,43 @@ const Page: React.FC = () => {
         },
         {
             title: '操作',
-            width: 160,
+            width: 180,
             valueType: 'option',
-            render: (_, record) => {
+            render: (_, record: any) => {
                 return <>
-                    <Button type="primary" onClick={() => {
-                    }}>启用</Button>
-                    <Button onClick={() => {
-                    }} style={{ marginLeft: 10 }} type="primary" danger>停用</Button>
+                    <Button disabled={record.canEdit == 0} type="primary" onClick={() => {
+                        setSelectItem(record)
+                        setVisiable(true)
+                    }}>修改</Button>
+
+                    {record.status == 0 && <Button disabled={record.canEdit == 0} style={{ marginLeft: 10 }} type="primary" onClick={() => {
+
+                        Modal.confirm({
+                            title: '温馨提示',
+                            content: `确定要启用：${record.userName}吗?`,
+                            onOk: () => {
+                                return reqUpdate({
+                                    status: 1,
+                                    id: record.id
+                                })
+                            }
+                        })
+
+                    }}>启用</Button>}
+
+                    {record.status == 1 && <Button disabled={record.canEdit == 0} onClick={() => {
+                        Modal.confirm({
+                            title: '温馨提示',
+                            content: `确定要停用：${record.userName}吗?`,
+                            onOk: () => {
+                                return reqUpdate({
+                                    status: 0,
+                                    id: record.id
+                                })
+                            }
+                        })
+                    }} style={{ marginLeft: 10 }} type="primary" danger>停用</Button>}
+
                 </>
             }
         },
@@ -85,32 +119,28 @@ const Page: React.FC = () => {
                     });
                 });
             }}
-            editable={{
-                type: 'multiple',
-            }}
-            columnsState={{
-                persistenceKey: 'pro-table-singe-demos',
-                persistenceType: 'localStorage',
-            }}
             rowKey="id"
             search={false}
-            pagination={{
-                pageSize: 10,
-            }}
+            pagination={false}
             dateFormatter="string"
             headerTitle="系统用户"
             toolBarRender={() => [
                 <Button
                     type="primary"
                     onClick={() => {
-                        // setAddVisible(true);
-                        history.push('/questionnaire/add')
+                        setVisiable(true)
                     }}
                 >
                     新增
                 </Button>
             ]}
         />
+        {visiable && <AddUser data={selectItem} visiable={visiable} onRefresh={() => {
+            actionRef.current?.reload();
+            setVisiable(false)
+        }} onClose={() => {
+            setVisiable(false)
+        }} />}
     </>
 }
 export default Page;
