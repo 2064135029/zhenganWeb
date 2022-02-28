@@ -7,6 +7,21 @@ export async function login(params: any) {
     method: 'POST',
     data: params,
     skipErrorHandler: true,
-    noToken: true,
+  });
+}
+
+// 登录
+export async function logout() {
+  return request('/web/user/logout', {
+    method: 'POST',
+    skipErrorHandler: true,
+  });
+}
+
+// 登录
+export async function getUserInfo() {
+  return request('/web/user/getUserInfo', {
+    method: 'POST',
+    skipErrorHandler: true,
   });
 }

@@ -78,10 +78,6 @@ const Page: React.FC = () => {
             render: (_, record) => {
                 return <>
                     <Button loading={fetches[record.id]?.loading} type="primary" onClick={() => {
-                        // reqUpdate({
-                        //     id: record.id,
-                        //     status: 1,
-                        // })
                         setSelectItem(record);
                         setVisible(true);
                     }}>配置</Button>

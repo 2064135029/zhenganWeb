@@ -34,13 +34,7 @@ const Login: React.FC = () => {
   const [type, setType] = useState<string>('account');
   const { initialState, setInitialState } = useModel('@@initialState');
 
-  const { loading, run: reqLogin } = useRequest(login, {
-    manual: true,
-    onSuccess: () => {
-      console.log('++++++++++');
-      history.push('/');
-    }
-  });
+
 
   const intl = useIntl();
 
@@ -53,6 +47,14 @@ const Login: React.FC = () => {
       }));
     }
   };
+  const { loading, run: reqLogin } = useRequest(login, {
+    manual: true,
+    onSuccess: () => {
+      console.log('++++++++++');
+      history.push('/');
+      fetchUserInfo();
+    }
+  });
 
   const handleSubmit = async (values: API.LoginParams) => {
     return reqLogin({ ...values, password: md5(values.password) });

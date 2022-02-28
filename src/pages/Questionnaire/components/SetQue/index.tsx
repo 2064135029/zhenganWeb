@@ -40,11 +40,13 @@ const Page: React.FC<PageProps> = ({ onClose, visible, data }) => {
         {
             title: '题目',
             dataIndex: 'title',
+            key: 'title',
             hideInSearch: true,
         },
         {
             title: '备注',
             dataIndex: 'remark',
+            key: 'remark',
             hideInSearch: true,
         },
         {
@@ -149,9 +151,9 @@ const Page: React.FC<PageProps> = ({ onClose, visible, data }) => {
             destroyOnClose
             visible={visible}
             onCancel={() => onClose()}
-            onOk={okHanlder}
-            cancelText="取消"
-            okText="保存">
+            // onOk={okHanlder}
+            cancelText="关闭"
+        >
             <ProTable<TableListItem>
                 search={false}
                 // rowSelection={rowSelection}
