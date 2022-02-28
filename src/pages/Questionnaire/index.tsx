@@ -20,6 +20,7 @@ export interface TableListItem {
 const Page: React.FC = () => {
     const ref = useRef<FormInstance>();
     const tableRef = useRef<ActionType>();
+    const [selectedRowKeys, setSelectedRowKeys] = useState<any>([]);
     const [selectedRows, setselectedRows] = useState<any>([]);
     const [collapsed, setCollapsed] = useState(false);
     const { fetches, run: reqUpdate } = useRequest(updateQue, {
@@ -99,9 +100,11 @@ const Page: React.FC = () => {
     ];
     const rowSelection = {
         type: 'radio',
+        selectedRowKeys,
         // eslint-disable-next-line @typescript-eslint/no-shadow
         onChange: (selectedRowKeys: React.Key[], selectedRows: any) => {
             setselectedRows(selectedRows);
+            setSelectedRowKeys(selectedRowKeys);
             console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
         },
     }
@@ -118,6 +121,8 @@ const Page: React.FC = () => {
                 delete p.current;
                 return getQueList(p).then((res) => {
                     console.log(res);
+                    setSelectedRowKeys([])
+                    setselectedRows([])
                     return Promise.resolve({
                         data: res.data.resultData,
                         total: res.data.totalRow,
@@ -148,6 +153,7 @@ const Page: React.FC = () => {
                             }).then(() => {
                                 message.success('发布成功');
                                 tableRef.current?.reload();
+
                             })
                         }
                     })
