@@ -31,31 +31,31 @@ export default [
   {
     path: '/questionnaire',
     name: '问诊管理',
-    icon: 'smile',
+    icon: 'ContactsFilled',
     component: './Questionnaire',
   },
   {
     path: '/category',
     name: '诊疗项目设置',
-    icon: 'smile',
+    icon: 'ScheduleFilled',
     component: './Category',
   },
   {
     path: '/result',
     name: '诊断结果',
-    icon: 'smile',
+    icon: 'MedicineBoxFilled',
     component: './Result',
   },
   {
     path: '/pay',
     name: '付款管理',
-    icon: 'smile',
+    icon: 'CreditCardFilled',
     component: './PayManage',
   },
   {
     path: '/sys',
     name: '系统管理',
-    icon: 'crown',
+    icon: 'SettingFilled',
     routes: [
       {
         path: '/sys/wx',
