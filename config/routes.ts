@@ -46,12 +46,12 @@ export default [
     icon: 'MedicineBoxFilled',
     component: './Result',
   },
-  {
-    path: '/pay',
-    name: '付款管理',
-    icon: 'CreditCardFilled',
-    component: './PayManage',
-  },
+  // {
+  //   path: '/pay',
+  //   name: '付款管理',
+  //   icon: 'CreditCardFilled',
+  //   component: './PayManage',
+  // },
   {
     path: '/sys',
     name: '系统管理',
