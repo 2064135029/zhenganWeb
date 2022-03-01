@@ -66,11 +66,12 @@ const Page: React.FC<PageProps> = ({ onClose, visible, data }) => {
             valueType: 'option',
             render: (_, record) => {
                 return <>
-                    <Button type="primary" onClick={() => {
+                    {record.type != 3 && <Button type="primary" onClick={() => {
                         setSelectItem(record);
                         setSelectSub(null);
                         setAddSubVisi(true);
-                    }}>添加答案</Button>
+                    }}>添加答案</Button>}
+
                     <Button onClick={() => {
                         setSelectItem(record);
                         setVisiable(true);
