@@ -73,6 +73,7 @@ const Page: React.FC = () => {
                 return <>
                     <Button type="primary" onClick={() => {
                         setSelectItem(record);
+                        setSelectSub(null);
                         setAddSubVisi(true);
                     }}>添加子类</Button>
                     <Button onClick={() => {
@@ -133,7 +134,9 @@ const Page: React.FC = () => {
                         key: 'operation',
                         valueType: 'option',
                         render: (_, record) => [<a onClick={() => {
-                            setSelectSub(record)
+                            setSelectSub(record);
+                            setSelectItem(data);
+                            setAddSubVisi(true);
                         }}>修改</a>, <a onClick={() => {
                             Modal.confirm({
                                 title: '温馨提示',

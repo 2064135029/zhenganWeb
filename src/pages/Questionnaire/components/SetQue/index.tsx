@@ -68,6 +68,7 @@ const Page: React.FC<PageProps> = ({ onClose, visible, data }) => {
                 return <>
                     <Button type="primary" onClick={() => {
                         setSelectItem(record);
+                        setSelectSub(null);
                         setAddSubVisi(true);
                     }}>添加答案</Button>
                     <Button onClick={() => {
@@ -110,6 +111,7 @@ const Page: React.FC<PageProps> = ({ onClose, visible, data }) => {
                 columns={[
                     { title: '序号', dataIndex: 'index', valueType: 'index', width: 80 },
                     { title: '答案', dataIndex: 'title', key: 'title' },
+                    { title: '症状', dataIndex: 'symptom', key: 'symptom' },
                     {
                         title: '操作',
                         dataIndex: 'operation',
@@ -147,7 +149,7 @@ const Page: React.FC<PageProps> = ({ onClose, visible, data }) => {
     };
 
     return <>
-        <FullModal title="整单调整"
+        <FullModal title="问卷情况"
             destroyOnClose
             visible={visible}
             onCancel={() => onClose()}
