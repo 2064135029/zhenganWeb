@@ -1,133 +1,61 @@
 import React, { useRef } from 'react';
-import { PlusOutlined, EllipsisOutlined } from '@ant-design/icons';
-import { Button, Tag, Space, Menu, Dropdown } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
+import { getWxUserList } from '../service';
 
-
-type GithubIssueItem = {
-    url: string;
-    id: number;
-    number: number;
-    title: string;
-    labels: {
-        name: string;
-        color: string;
-    }[];
-    state: string;
-    comments: number;
-    created_at: string;
-    updated_at: string;
-    closed_at?: string;
-};
 const Page: React.FC = () => {
     const actionRef = useRef<ActionType>();
-    const columns: ProColumns<GithubIssueItem>[] = [
+    const columns: ProColumns<any>[] = [
         {
             dataIndex: 'index',
             valueType: 'indexBorder',
             width: 48,
         },
         {
-            title: '标题',
-            dataIndex: 'title',
-            copyable: true,
-            ellipsis: true,
-            tip: '标题过长会自动收缩',
-            formItemProps: {
-                rules: [
-                    {
-                        required: true,
-                        message: '此项为必填项',
-                    },
-                ],
-            },
+            title: '昵称',
+            dataIndex: 'nickname',
         },
         {
-            title: '状态',
-            dataIndex: 'state',
-            filters: true,
-            onFilter: true,
-            valueType: 'select',
-            valueEnum: {
-                all: { text: '全部', status: 'Default' },
-                open: {
-                    text: '未解决',
-                    status: 'Error',
-                },
-                closed: {
-                    text: '已解决',
-                    status: 'Success',
-                    disabled: true,
-                },
-                processing: {
-                    text: '解决中',
-                    status: 'Processing',
-                },
-            },
-        },
-        {
-            title: '标签',
-            dataIndex: 'labels',
-            search: false,
-            renderFormItem: (_, { defaultRender }) => {
-                return defaultRender(_);
-            },
-            render: (_, record) => (
-                <Space>
-                    {record.labels.map(({ name, color }) => (
-                        <Tag color={color} key={name}>
-                            {name}
-                        </Tag>
-                    ))}
-                </Space>
-            ),
-        },
-        {
-            title: '创建时间',
-            key: 'showTime',
-            dataIndex: 'created_at',
-            valueType: 'dateTime',
-            sorter: true,
+            title: '性别',
+            dataIndex: 'gender',
             hideInSearch: true,
+            render: (t) => {
+                if (t === 0) {
+                    return '男'
+                }
+                return '女'
+            }
+        },
+        {
+            title: '手机',
+            dataIndex: 'mobile',
         },
         {
             title: '创建时间',
-            dataIndex: 'created_at',
-            valueType: 'dateRange',
-            hideInTable: true,
-            search: {
-                transform: (value) => {
-                    return {
-                        startTime: value[0],
-                        endTime: value[1],
-                    };
-                },
-            },
-        },
-        {
-            title: '操作',
-            valueType: 'option',
-            render: (text, record, _, action) => [
-
-            ],
+            key: 'ctime',
+            hideInSearch: true,
+            dataIndex: 'ctime',
+            valueType: 'dateTime'
         },
     ];
 
 
     return <>
-        <ProTable<GithubIssueItem>
+        <ProTable<any>
             columns={columns}
             actionRef={actionRef}
-            request={async (params = {}, sort, filter) => {
-
-            }}
-            editable={{
-                type: 'multiple',
-            }}
-            columnsState={{
-                persistenceKey: 'pro-table-singe-demos',
-                persistenceType: 'localStorage',
+            request={async (params = {}) => {
+                const p = {
+                    ...params,
+                    page: params.current,
+                };
+                delete p.current;
+                return getWxUserList(p).then((res) => {
+                    return Promise.resolve({
+                        data: res.data.resultData,
+                        total: res.data.totalRow,
+                    });
+                });
             }}
             rowKey="id"
             search={{
@@ -137,7 +65,7 @@ const Page: React.FC = () => {
                 pageSize: 10,
             }}
             dateFormatter="string"
-            headerTitle="高级表格"
+            headerTitle="微信用户"
         />
     </>
 }

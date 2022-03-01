@@ -46,3 +46,19 @@ export async function addRole(params: any) {
     skipErrorHandler: true,
   });
 }
+export async function getWxUserList(params: any) {
+  return request('/web/user/getWxUserList', {
+    method: 'POST',
+    data: params,
+    skipErrorHandler: true,
+  });
+}
+
+//
+export async function getWxPatientList(params: any) {
+  return request('/web/user/getWxPatientList', {
+    method: 'POST',
+    data: params,
+    skipErrorHandler: true,
+  });
+}
